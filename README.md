@@ -1,6 +1,28 @@
+<div align="center">
+
 # Multimodal RAG on PDF Reports
 
+Ask questions about PDF reports and get answers from their text and their charts, with the source named.
+
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
+![OpenAI](https://img.shields.io/badge/OpenAI-vision%20and%20embeddings-412991?style=flat-square&logo=openai&logoColor=white)
+![PyMuPDF](https://img.shields.io/badge/PyMuPDF-PDF%20extraction-2E7D32?style=flat-square)
+![Eval](https://img.shields.io/badge/golden%20set-70%2F71-brightgreen?style=flat-square)
+
+</div>
+
+## Overview
+
 Ask questions about two short PDF reports and get answers from their text and from their charts and maps, with the source named. Search finds the right pages and figures, and a vision model reads the real pictures.
+
+## Key Features
+
+- **Text and figures:** answers come from report text and from charts and maps, with the source named.
+- **Figures found by caption:** each figure is cropped through its caption and searched through a saved text description.
+- **Two ranked lists:** text and figures are ranked separately because their scores are not comparable.
+- **Whole pages for reading:** chunks are used to search, and the full page of each chunk goes to the model.
+- **No gap filling:** the model may not use other years or outside knowledge, and the code checks every cited source was sent.
+- **Golden dataset evaluation:** 71 questions, including traps and a holdout set, scored with and without figures.
 
 ## How it works
 
@@ -33,7 +55,18 @@ Five design choices, each for a reason:
 | `noaa_sea_ice_2020.pdf` | [NOAA Arctic Report Card 2020: Sea Ice](https://repository.library.noaa.gov/view/noaa/27904/noaa_27904_DS1.pdf) | 10 | 5: maps, line chart, area chart, histogram |
 | `cdc_long_covid_children_2022.pdf` | [CDC NCHS Data Brief No. 479](https://www.cdc.gov/nchs/data/databriefs/db479.pdf) | 6 | 3: bar charts |
 
-## Project structure
+## Tech Stack
+
+| Area | Technology |
+|---|---|
+| Language | Python 3.12 |
+| PDF extraction | PyMuPDF |
+| Embeddings | OpenAI text-embedding-3-small, CLIP (openai/clip-vit-base-patch32) |
+| Vision model | OpenAI gpt-5.4-mini |
+| Vector search | NumPy |
+| Tests | pytest |
+
+## Project Structure
 
 ```text
 ingest.py               Builds the index from the PDFs
@@ -57,7 +90,9 @@ eval/results/           Saved results
 tests/                  18 tests, no key and no CLIP download needed
 ```
 
-## Setup and run
+## Getting Started
+
+### Installation and run
 
 Python 3.12. In PowerShell:
 
@@ -139,7 +174,7 @@ On the holdout set the same three scored 5/10, 9/10 and 7/10 in the top 1.
 - The bigger model was not the better one, so the smaller one is used.
 - The scorer itself was wrong several times: the 5 in "Figure 5" passed as an answer, and so did any answer naming the right word in a wrong claim. So answers are also read by hand.
 
-## Limitations
+## Limitations and Roadmap
 
 - 71 questions on 2 documents is small, and one person wrote them, so these numbers are not a general claim. Only the 16 holdout questions were never tuned on.
 - Values read from a chart are estimates, so a small error is allowed when scoring them.
